@@ -106,6 +106,21 @@ typedef GLXContext(*PFNGLXCREATECONTEXTATTRIBSARBPROC) (Display * dpy,
 #endif
 #endif
 
+#ifndef GLX_MESA_query_renderer
+#define GLX_MESA_query_renderer
+#define GLX_RENDERER_VENDOR_ID_MESA                      0xXXXX
+#define GLX_RENDERER_DEVICE_ID_MESA                      0xXXXX
+#define GLX_RENDERER_VERSION_MESA                        0xXXXX
+#define GLX_RENDERER_ACCELERATED_MESA                    0xXXXX
+#define GLX_RENDERER_VIDEO_MEMORY_MESA                   0xXXXX
+#define GLX_RENDERER_UNIFIED_MEMORY_ARCHITECTURE_MESA    0xXXXX
+#define GLX_RENDERER_PREFERRED_PROFILE_MESA              0xXXXX
+#define GLX_RENDERER_OPENGL_CORE_PROFILE_VERSION_MESA    0xXXXX
+#define GLX_RENDERER_OPENGL_COMPATIBILITY_PROFILE_VERSION_MESA    0xXXXX
+#define GLX_RENDERER_OPENGL_ES_PROFILE_VERSION_MESA      0xXXXX
+#define GLX_RENDERER_OPENGL_ES2_PROFILE_VERSION_MESA     0xXXXX
+#endif
+
 #ifndef GLX_ARB_framebuffer_sRGB
 #define GLX_ARB_framebuffer_sRGB
 #ifndef GLX_FRAMEBUFFER_SRGB_CAPABLE_ARB
@@ -388,6 +403,32 @@ X11_GL_InitExtensions(_THIS)
         _this->gl_data->HAS_GLX_EXT_create_context_es2_profile = SDL_TRUE;
     }
 
+    /* Check for GLX_MESA_query_renderer */
+    if (HasExtension("GLX_MESA_query_renderer", extensions)) {
+        _this->gl_data->glXQueryRendererIntegerMESA =
+            (int(*)(int)) X11_GL_GetProcAddress(
+                _this, "glXQueryRendererIntegerMESA");
+        _this->gl_data->glXQueryCurrentRendererIntegerMESA =
+            (int(*)(void)) X11_GL_GetProcAddress(
+                _this, "glXQueryCurrentRendererIntegerMESA");
+        _this->gl_data->glXQueryRendererStringMESA =
+            (int(*)(int)) X11_GL_GetProcAddress(
+                _this, "glXQueryRendererStringMESA");
+        _this->gl_data->glXQueryCurrentRendererStringMESA =
+            (int(*)(void)) X11_GL_GetProcAddress(
+                _this, "glXQueryCurrentRendererStringMESA");
+    }
+    
+    /* Check for GL_NVX_gpu_memory_info */
+    if (HasExtension("GL_NVX_gpu_memory_info", extensions)) {
+        _this->gl_data->HAS_GL_NVX_gpu_memory_info = SDL_TRUE;
+    }
+    
+    /* Check for GL_NVX_gpu_memory_info */
+    if (HasExtension("GL_NVX_gpu_memory_info", extensions)) {
+        _this->gl_data->HAS_GL_NVX_gpu_memory_info = SDL_TRUE;
+    }
+    
     if (context) {
         _this->gl_data->glXMakeCurrent(display, None, NULL);
         _this->gl_data->glXDestroyContext(display, context);
@@ -794,6 +835,22 @@ X11_GL_GetSwapInterval(_THIS)
     } else {
         return swapinterval;
     }
+}
+
+int
+X11_GL_GetRendererInfo(_THIS)
+{
+    int status = -1;
+    if (_this->gl_data->glXQueryCurrentRendererIntegerMESA) {
+
+        return (int) interval;
+    } else if (_this->gl_data->glXQueryCurrentRendererIntegerMESA) {
+        return _this->gl_data->glXGetSwapIntervalMESA();
+    } else if (_this->gl_data->glXQueryCurrentRendererIntegerMESA) {
+        return _this->gl_data->glXGetSwapIntervalMESA();
+    }
+    
+    return status;
 }
 
 void
